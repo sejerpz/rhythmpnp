@@ -10,9 +10,9 @@ AM_CPPFLAGS = \
 	-I $(top_srcdir)/rb-include/widgets \
 	$(NULL)
 
-librhythmpnp_ladir = $(PLUGINDIR)/rhythmpnp
+plugindir = $(PLUGINDIR)/rhythmpnp
 
-librhythmpnp_la_LTLIBRARIES = librhythmpnp.la
+plugin_LTLIBRARIES = librhythmpnp.la
 
 plugin_in_files = rhythmpnp.rb-plugin
 
@@ -22,11 +22,19 @@ librhythmpnp_la_SOURCES = \
 	main.vala \
 	$(NULL)
 
+librhythmpnp_la_LDFLAGS = \
+	-module \
+	-avoid-version \
+	$(NULL)
+
+#not supported by vala integration?!?
+#librhythmpnp_la_LIBTOOLFLAGS = --tag=disable-static
+
 librhythmpnp_la_LIBADD = \
 	$(RHYTHMPNP_LIBS) \
 	$(NULL)
 
-librhythmpnp_la_DATA = $(plugin_in_files:.rb-plugin.in=.rb-plugin)
+plugin_DATA = $(plugin_in_files:.rb-plugin.in=.rb-plugin)
 
 EXTRA_DIST = \
 	$(plugin_in_files) \

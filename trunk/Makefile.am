@@ -9,7 +9,7 @@ SUBDIRS = \
 	rb-include \
 	$(NULL)
 
-rhythmpnpdocdir = ${prefix}/doc/rhythmpnp
+rhythmpnpdocdir = ${datadir}/doc/rhythmpnp
 rhythmpnpdoc_DATA = \
 	ChangeLog \
 	README \
