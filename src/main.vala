@@ -38,7 +38,7 @@ public class UPnpDevice : RB.BrowserSource
 	private bool _activated = false;
 	private ServiceProxy _service_proxy;
 	private int _starting_index = 0;
-		
+	
 	private GLib.List<GUPnP.DIDLLiteItem> _cache = new GLib.List<GUPnP.DIDLLiteItem>();
 	
 	public string id {
@@ -169,15 +169,17 @@ public class UPnpDevice : RB.BrowserSource
 	{
 		debug ("music search complete for %s", proxy.get_id ());
 		string result;
-		string number = "0";
-		string total_matches = "0";
+		string result_number;
+		string result_total_matches;
 		string update_id = null;
+		int number = 0;
+		int total_matches = 0;
 		
  		try {
 			if (!proxy.end_action (action, 
 				"Result", typeof(string), out result,
-				"NumberReturned", typeof(string), out number,
-				"TotalMatches", typeof(string), out total_matches,
+				"NumberReturned", typeof(string), out result_number,
+				"TotalMatches", typeof(string), out result_total_matches,
 				"UpdateID", typeof(string), out update_id)) {
 			    	critical ("end_action on proxy %s failed", proxy.get_id ());
 				is_loading = false;
@@ -187,14 +189,18 @@ public class UPnpDevice : RB.BrowserSource
 		} catch (Error err) {
 			debug ("error %s %d", err.message, err.code);
 		}
-		debug ("number returned: %s\ntotal matches: %s\nupdateid: %s\n", number, total_matches, update_id);
+		
+		number = result_number.to_int ();
+		total_matches = result_total_matches.to_int ();
+		
+		debug ("items returned: %d current count: %d total items: %d", number, number + _starting_index, total_matches);
 
 		if (_deleted)  { // if the source was delete stop scanning the media library
 			is_loading = false;
 			return;
 		}
 			
-		if (number != null && number != "0") {
+		if (number > 0) {
 			// parsing the result
 			GUPnP.DIDLLiteParser parser = new GUPnP.DIDLLiteParser ();
 			parser.item_available.connect (this.on_item_available);
@@ -215,11 +221,11 @@ public class UPnpDevice : RB.BrowserSource
 		}
 		_cache = null;
 		
-		if (number.to_int () == 0) {
+		if ((_starting_index + number) >= total_matches) {
 			is_loading = false;
 			this.notify_status_changed ();
 		} else {
-			_starting_index	+= CHUNK_SIZE;
+			_starting_index	+= number;
 			start_music_search (); // continue searching
 		}
 	}
@@ -261,47 +267,47 @@ public class RhythmPnPPlugin : RB.Plugin
 {
 	private unowned RB.Shell _shell = null;
 	
-	private Context _context;
-	private ControlPoint _control_point;
+	private ContextManager _context_manager;
 	private GLib.List<UPnpDevice> _devices = new GLib.List<UPnpDevice> ();
-
+	
 	public RhythmPnPPlugin ()
 	{
 		GLib.Object ();
+	}
+	
+	private void on_context_available (ContextManager sender, Context context)
+	{
+		debug ("context available");
+		sender.manage_control_point (create_control_point (context));
 	}
 	
 	public override void activate (RB.Shell shell)
 	{
 		debug ("plugin activated");
 		this._shell = shell;
-		setup_upnp_discovery ();
+		
+		/* create context manager */
+		_context_manager = new ContextManager(null, 0);
+		_context_manager.context_available.connect (this.on_context_available);
 	}
 
 	public override void deactivate (RB.Shell shell)
 	{
 		debug ("plugin deactivated");
-		cleanup_upnp ();
+		_context_manager.context_available.disconnect (this.on_context_available);
+		_context_manager = null;
 	}
 		
-	private void setup_upnp_discovery ()
+	private ControlPoint create_control_point (Context context)
 	{
-		debug ("setup upnp discovery");
-		try {
-			_context = new Context (null, null, 0);
-			_control_point = new ControlPoint (_context, "urn:schemas-upnp-org:device:MediaServer:2");
-			_control_point.device_proxy_available.connect (this.on_device_proxy_available);
-			_control_point.device_proxy_unavailable.connect (this.on_device_proxy_unavailable);
-			_control_point.active = true;
-		} catch (Error err) {
-			warning ("error while setting up upnp discovery: %s", err.message);
-		}
-	}
-
-	private void cleanup_upnp ()	
-	{
-		_control_point.active = false;
-		_control_point = null;
-		_context = null;
+		debug ("create control point");
+		
+		var control_point = new ControlPoint (context, "urn:schemas-upnp-org:device:MediaServer:2");
+		control_point.device_proxy_available.connect (this.on_device_proxy_available);
+		control_point.device_proxy_unavailable.connect (this.on_device_proxy_unavailable);
+		control_point.active = true;
+		
+		return control_point;
 	}
 	
 	public UPnpDevice? create_upnp_device (RB.Plugin plugin, RB.Shell shell, DeviceProxy proxy)
