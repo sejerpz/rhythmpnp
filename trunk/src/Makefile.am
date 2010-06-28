@@ -19,7 +19,12 @@ plugin_in_files = rhythmpnp.rb-plugin
 librhythmpnp_la_VALAFLAGS = --vapidir ../vapi --thread --pkg libsoup-2.4 --pkg gupnp-1.0 --pkg gupnp-av-1.0 --pkg gstreamer-0.10 --pkg rb
 
 librhythmpnp_la_SOURCES = \
-	main.vala \
+	rhythmpnpplugin.vala \
+	upnpmedialibrarydevice.vala \
+	upnpstreamingdevice.vala \
+	iupnpdevice.vala \
+	utils.vala \
+	default-options.vala \
 	$(NULL)
 
 librhythmpnp_la_LDFLAGS = \

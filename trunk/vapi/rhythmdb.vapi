@@ -1,4 +1,4 @@
-[CCode (cheader_filename = "rhythmdb.h")]
+[CCode (cheader_filename = "rhythmdb.h", lower_case_cprefix="rhythmdb_")]
 namespace RhythmDB
 {
 	[CCode(cprefix="RHYTHMDB_ENTRY_")]
@@ -120,5 +120,12 @@ namespace RhythmDB
 
 		[CCode(cname="rhythmdb_commit")]
 		public void commit ();
+	}
+	
+	[CCode (cheader_filename = "rhythmdb-query-model.h")]
+	public class QueryModel : GLib.Object
+	{
+		public QueryModel.empty (RhythmDB.DB db);
+		public void add_entry (Entry entry, int index = -1);
 	}
 }

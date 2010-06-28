@@ -2,7 +2,7 @@ NULL =
 
 vapis = \
 	rb.deps \
-	rb.vapi \ 
+	rb.vapi \
 	rhythmdb.deps \
 	rhythmdb.vapi \
 	$(NULL)

@@ -1,7 +1,7 @@
 [CCode (cprefix = "RB", lower_case_cprefix = "rb_")]
 namespace RB {
 	[CCode (cheader_filename = "rb-shell.h", ref_function = "g_object_ref", unref_function = "g_object_unref")]
-	public class Shell 
+	public class Shell : GLib.Object
 	{
 		[CCode (cname = "rb_shell_get_type")]
 		public static GLib.Type get_type ();
@@ -50,7 +50,7 @@ namespace RB {
 		public virtual bool remove_filter(Gst.Element e);
 	}
 
-	public class Source : GLib.Object
+	public class Source : Gtk.HBox
 	{
 		[NoAccessorMethod]
 		public string name {
@@ -82,6 +82,11 @@ namespace RB {
 			get; construct set;
 		}
 		
+		[NoAccessorMethod]
+		public RB.SourceGroup source_group {
+			get; construct set;
+		}
+		
 		[HasEmitter]
 		public virtual signal void notify_status_changed ();
 		
@@ -95,15 +100,44 @@ namespace RB {
 		
 		public virtual void delete_thyself ();
 		
+		public virtual RB.EntryView impl_get_entry_view ();
+		
+		public virtual bool impl_can_browse ();
+		
 /*		
 		public SearchType search_type {
 			get; construct set;
 		}
 */
 	}
+
+	[CCode(cheader_filename="rb-source-group.h")]	
+	public class SourceGroup
+	{
+		[CCode (cname = "RB_SOURCE_GROUP_LIBRARY")]
+		public static SourceGroup library;
+		
+		[CCode (cname = "RB_SOURCE_GROUP_PLAYLISTS")]
+		public static SourceGroup playlists;
+		
+		[CCode (cname = "RB_SOURCE_GROUP_DEVICES")]
+		public static SourceGroup devices;
+		
+		[CCode (cname = "RB_SOURCE_GROUP_SHARED")]
+		public static SourceGroup shared;
+		          
+		[CCode (cname = "RB_SOURCE_GROUP_STORES")]
+		public static SourceGroup stores;
+	}
 	
 	[CCode(cheader_filename="rb-browser-source.h")]
 	public class BrowserSource : RB.Source
+	{
+		
+	}
+
+	[CCode(cheader_filename="rb-streaming-source.h")]
+	public class StreamingSource : RB.Source
 	{
 		
 	}
@@ -136,5 +170,32 @@ namespace RB {
 	public interface Player : GLib.Object {
 		[CCode (cname = "rb_player_opened")]
 		public bool opened();
+	}
+	
+	[CCode (cprefix="RB_ENTRY_VIEW_COL_")]
+	public enum EntryViewColumn {
+		TRACK_NUMBER,
+		TITLE,
+		ARTIST,
+		ALBUM,
+		GENRE,
+		DURATION,
+		QUALITY,
+		RATING,
+		PLAY_COUNT,
+		YEAR,
+		LAST_PLAYED,
+		FIRST_SEEN,
+		LAST_SEEN,
+		LOCATION,
+		ERROR
+	}
+
+	[CCode (cheader_filename="rb-entry-view.h")]	
+	public class EntryView : Gtk.ScrolledWindow
+	{
+		public EntryView (RhythmDB.DB db, GLib.Object shell_player, string sort_key, bool is_drag_source = false, bool is_drag_dest = false);
+		public void append_column (EntryViewColumn column_type, bool always_visible);
+		public void set_model (RhythmDB.QueryModel model);
 	}
 }
