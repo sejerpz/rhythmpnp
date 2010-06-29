@@ -21,6 +21,7 @@
 
 using GLib;
 
+[CCode (lower_case_cprefix="rhythmpnp_")]
 namespace RhythmPnP
 {
 	public interface IDevice : GLib.Object

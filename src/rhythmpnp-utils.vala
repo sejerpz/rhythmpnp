@@ -25,89 +25,92 @@ using Gtk;
 using GUPnP;
 using RhythmDB;
 
-namespace RhythmPnP.Utils
+[CCode (lower_case_cprefix="rhythmpnp_")]
+namespace RhythmPnP
 {
-	internal static Gdk.Pixbuf? get_device_icon (DeviceProxy device, int preferred_depth, int preferred_width, int preferred_height)
+	namespace Utils
 	{
-		Gdk.Pixbuf pixbuf = null;
-		string mime_type;
-		int width, height;
+		internal static Gdk.Pixbuf? get_device_icon (DeviceProxy device, int preferred_depth, int preferred_width, int preferred_height)
+		{
+			Gdk.Pixbuf pixbuf = null;
+			string mime_type;
+			int width, height;
 	
-		//get the device icon
-		try {
-			var icon_url = device.get_icon_url (null,
-				 preferred_depth,
-				 preferred_width,
-				 preferred_height,
-				 true,
-				 out mime_type,
-				 null,
-				 out width,
-				 out height);
-				 
-			if (icon_url != null) {
-				debug ("device icon url: %s", icon_url);
-				var message = new Soup.Message ("GET", icon_url);
-				var session = new Soup.SessionAsync ();
-				session.send_message (message);
-				if (message.status_code == 200) {
-					// get icon from message
-					var loader = new Gdk.PixbufLoader.with_mime_type (mime_type);
-					if (loader != null) {
-						try {
-							loader.write (message.response_body.data, (size_t)message.response_body.length);
-							pixbuf = loader.get_pixbuf ();
-							if (pixbuf != null) {
-								float aspect_ratio = (float) width / (float) height;
-								int final_height = (int) (preferred_width / aspect_ratio);
-								pixbuf = pixbuf.scale_simple (preferred_height, final_height, Gdk.InterpType.HYPER);
+			//get the device icon
+			try {
+				var icon_url = device.get_icon_url (null,
+					 preferred_depth,
+					 preferred_width,
+					 preferred_height,
+					 true,
+					 out mime_type,
+					 null,
+					 out width,
+					 out height);
+					 
+				if (icon_url != null) {
+					RB.debug ("device icon url: %s", icon_url);
+					var message = new Soup.Message ("GET", icon_url);
+					var session = new Soup.SessionAsync ();
+					session.send_message (message);
+					if (message.status_code == 200) {
+						// get icon from message
+						var loader = new Gdk.PixbufLoader.with_mime_type (mime_type);
+						if (loader != null) {
+							try {
+								loader.write (message.response_body.data, (size_t)message.response_body.length);
+								pixbuf = loader.get_pixbuf ();
+								if (pixbuf != null) {
+									float aspect_ratio = (float) width / (float) height;
+									int final_height = (int) (preferred_width / aspect_ratio);
+									pixbuf = pixbuf.scale_simple (preferred_height, final_height, Gdk.InterpType.HYPER);
+								}
+								loader.close ();
+							} catch (Error err) {
+								warning ("error while loading the pixbuf: %s", err.message);
 							}
-							loader.close ();
-						} catch (Error err) {
-							warning ("error while loading the pixbuf: %s", err.message);
+						} else {
+							warning ("error creating pixbuf loader for mime type %s", mime_type);
 						}
 					} else {
-						warning ("error creating pixbuf loader for mime type %s", mime_type);
+						warning ("error sending icon message: %u", message.status_code);
 					}
 				} else {
-					warning ("error sending icon message: %u", message.status_code);
+					RB.debug ("no device icon found");
 				}
-			} else {
-				debug ("no device icon found");
+			} catch (Error err) {
+				warning ("error getting device icon: %s", err.message);
 			}
-		} catch (Error err) {
-			warning ("error getting device icon: %s", err.message);
+			return pixbuf;
 		}
-		return pixbuf;
-	}
 
-	internal static GUPnP.DIDLLiteResource? get_best_resource (GUPnP.DIDLLiteItem item)
-	{
-		string[] mime_types = new string[] { "audio/ogg", "audio/mpeg", "audio/x-wav", "audio/" }; // in order of preference
+		internal static GUPnP.DIDLLiteResource? get_best_resource (GUPnP.DIDLLiteItem item)
+		{
+			string[] mime_types = new string[] { "audio/ogg", "audio/mpeg", "audio/x-wav", "audio/" }; // in order of preference
 		
-		foreach (string mime_type in mime_types) {
-			foreach (GUPnP.DIDLLiteResource res in item.get_resources ()) {
-				if (res.protocol_info.mime_type.has_prefix (mime_type)) {
-					return res;
+			foreach (string mime_type in mime_types) {
+				foreach (GUPnP.DIDLLiteResource res in item.get_resources ()) {
+					if (res.protocol_info.mime_type.has_prefix (mime_type)) {
+						return res;
+					}
 				}
 			}
-		}
 		
-		return null;
-	}
+			return null;
+		}
 	
-	internal static void start_predefined_search (ServiceProxy service_proxy, GUPnP.ServiceProxyActionCallback callback, int starting_index, int requested_count = 0)
-	{
-		service_proxy.begin_action (
-			"Search", callback,
-			"ContainerID", typeof(string), "0",
-			"SearchCriteria", typeof(string), "upnp:class derivedFrom \"object.item.audioItem\"",
-			"Filter", typeof(string), "dc:title,dc:creator,dc:date,upnp:album,upnp:originalTrackNumber,res@duration",
-			"StartingIndex", typeof(string), starting_index.to_string (),
-			"RequestedCount", typeof(string), requested_count.to_string (),
-			"SortCriteria", typeof(string), "");
+		internal static void start_predefined_search (ServiceProxy service_proxy, GUPnP.ServiceProxyActionCallback callback, int starting_index, int requested_count = 0)
+		{
+			service_proxy.begin_action (
+				"Search", callback,
+				"ContainerID", typeof(string), "0",
+				"SearchCriteria", typeof(string), "upnp:class derivedFrom \"object.item.audioItem\"",
+				"Filter", typeof(string), "dc:title,dc:creator,dc:date,upnp:album,upnp:originalTrackNumber,res@duration",
+				"StartingIndex", typeof(string), starting_index.to_string (),
+				"RequestedCount", typeof(string), requested_count.to_string (),
+				"SortCriteria", typeof(string), "");
 
+		}
 	}
-
 }
 

@@ -21,14 +21,18 @@
 
 using GLib;
 
-namespace RhythmPnP.DefaultOptions
+[CCode (lower_case_cprefix="rhythmpnp_")]
+namespace RhythmPnP
 {
-	internal const int SEARCH_CHUNK_SIZE = 500;
-	internal const int ICON_PREFERRED_DEPTH = 32;
-	internal const int ICON_PREFERRED_WIDTH = 22;
-	internal const int ICON_PREFERRED_HEIGHT = 22;
+	namespace DefaultOptions
+	{
+		internal const int SEARCH_CHUNK_SIZE = 500;
+		internal const int ICON_PREFERRED_DEPTH = 32;
+		internal const int ICON_PREFERRED_WIDTH = 22;
+		internal const int ICON_PREFERRED_HEIGHT = 22;
 	
-	internal const string CONF_PREFIX = "/app/rhythmbox";
-	internal const string SORTING = "state/rhythmpnp/sorting";
+		internal const string CONF_PREFIX = "/app/rhythmbox";
+		internal const string SORTING = "state/rhythmpnp/sorting";
+	}
 }
 

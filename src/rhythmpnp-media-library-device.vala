@@ -26,6 +26,7 @@ using Gst;
 using GUPnP;
 using RhythmDB;
 
+[CCode (lower_case_cprefix="rhythmpnp_")]
 namespace RhythmPnP
 {
 	public class MediaLibraryDevice : IDevice, RB.BrowserSource
@@ -69,7 +70,7 @@ namespace RhythmPnP
 	
 		public override void impl_activate ()
 		{
-			debug ("source %s activated", id);
+			RB.debug ("source %s activated", id);
 			_active = true;
 			if (!_activated) {
 				_activated = true;
@@ -82,7 +83,7 @@ namespace RhythmPnP
 	
 		public override void impl_deactivate ()
 		{
-			debug ("source %s deactivate", id);
+			RB.debug ("source %s deactivate", id);
 			_active = false;
 		}
 	
@@ -99,14 +100,14 @@ namespace RhythmPnP
 	
 		private void start_music_search ()
 		{
-			debug ("start music search for %s", id);
+			RB.debug ("start music search for %s", id);
 			_cache = new GLib.List<GUPnP.DIDLLiteItem>();
 			Utils.start_predefined_search (_service_proxy, this.complete_music_search, _starting_index, DefaultOptions.SEARCH_CHUNK_SIZE);
 		}
 	
 		private void complete_music_search (GUPnP.ServiceProxy proxy, GUPnP.ServiceProxyAction action)
 		{
-			debug ("music search complete for %s", proxy.get_id ());
+			RB.debug ("music search complete for %s", proxy.get_id ());
 			string result;
 			string result_number;
 			string result_total_matches;
@@ -126,7 +127,7 @@ namespace RhythmPnP
 					return;
 				}
 			} catch (Error err) {
-				debug ("error %s %d", err.message, err.code);
+				RB.debug ("error %s %d", err.message, err.code);
 			}
 		
 			if (result_number != null && result_number != "")
@@ -135,7 +136,7 @@ namespace RhythmPnP
 			if (result_total_matches != null && result_total_matches != "")
 				total_matches = result_total_matches.to_int ();
 		
-			debug ("items returned: %d current count: %d total items: %d", number, number + _starting_index, total_matches);
+			RB.debug ("items returned: %d current count: %d total items: %d", number, number + _starting_index, total_matches);
 
 			if (_deleted)  { // if the source was delete stop scanning the media library
 				is_loading = false;
@@ -198,7 +199,7 @@ namespace RhythmPnP
 	
 		public void cleanup ()
 		{
-			debug ("source %s cleanup", id);
+			RB.debug ("source %s cleanup", id);
 			this.shell.db.entry_delete_by_type (this.entry_type);
 			_deleted = true;
 			delete_thyself ();
