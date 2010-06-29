@@ -207,11 +207,10 @@ namespace RhythmPnP
 		{
 			var res = Utils.get_best_resource (item);		
 			if (res != null) {
-				debug ("launch add entry %s", res.uri);
+				debug ("new gst-launch entry found with uri: %s", res.uri);
 				unowned RhythmDB.Entry? entry = db.entry_new (this.entry_type, res.uri);
 				if (entry != null) {
 					db.entry_set (entry, EntryPropType.TITLE, item.title ?? "");
-					db.entry_set (entry, EntryPropType.GENRE, item.genre ?? "");
 					_model.add_entry (entry);
 				}
 			}
