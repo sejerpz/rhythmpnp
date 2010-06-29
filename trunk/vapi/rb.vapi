@@ -198,4 +198,7 @@ namespace RB {
 		public void append_column (EntryViewColumn column_type, bool always_visible);
 		public void set_model (RhythmDB.QueryModel model);
 	}
+	
+	[CCode (cheader_filename="rb-debug.h")]
+	public static void debug (string format, ...);
 }

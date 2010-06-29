@@ -26,6 +26,7 @@ using Gst;
 using GUPnP;
 using RhythmDB;
 
+[CCode (lower_case_cprefix="rhythmpnp_")]
 namespace RhythmPnP
 {
 	public class Plugin : RB.Plugin 
@@ -42,13 +43,13 @@ namespace RhythmPnP
 	
 		private void on_context_available (ContextManager sender, Context context)
 		{
-			debug ("context available");
+			RB.debug ("context available");
 			sender.manage_control_point (create_control_point (context));
 		}
 	
 		public override void activate (RB.Shell shell)
 		{
-			debug ("plugin activated");
+			RB.debug ("plugin activated");
 			this._shell = shell;
 		
 			/* create context manager */
@@ -58,14 +59,14 @@ namespace RhythmPnP
 
 		public override void deactivate (RB.Shell shell)
 		{
-			debug ("plugin deactivated");
+			RB.debug ("plugin deactivated");
 			_context_manager.context_available.disconnect (this.on_context_available);
 			_context_manager = null;
 		}
 		
 		private ControlPoint create_control_point (Context context)
 		{
-			debug ("create control point");
+			RB.debug ("create control point");
 		
 			var control_point = new ControlPoint (context, "urn:schemas-upnp-org:device:MediaServer:2");
 			control_point.device_proxy_available.connect (this.on_device_proxy_available);
@@ -81,9 +82,9 @@ namespace RhythmPnP
 		
 			//try to find a content directory service
 			foreach (ServiceInfo service in proxy.list_services ()) {
-				debug ("service of type %s exposed %s: %s", service.get_type ().name (), service.udn, service.service_type);
+				RB.debug ("service of type %s exposed %s: %s", service.get_type ().name (), service.udn, service.service_type);
 				if (service is ServiceProxy && service.service_type.contains (":ContentDirectory:")) {
-					debug ("found a ContentDirectory service");
+					RB.debug ("found a ContentDirectory service");
 					if (service.get_control_url ().contains("/GstLaunch/")) {
 						var streaming_device = new StreamingDevice (proxy, (ServiceProxy) service, plugin, shell);		
 						streaming_device.name = proxy.get_friendly_name ();
@@ -101,7 +102,7 @@ namespace RhythmPnP
 
 		private void on_device_proxy_available (GUPnP.DeviceProxy proxy)
 		{
-			debug ("device available '%s': %s", proxy.get_friendly_name (), proxy.get_device_type ());
+			RB.debug ("device available '%s': %s", proxy.get_friendly_name (), proxy.get_device_type ());
 			if (find_device_for_udn (proxy.udn) != null) {
 				warning ("duplicate proxy device object found: %s", proxy.udn);
 				return;
@@ -113,13 +114,13 @@ namespace RhythmPnP
 			if (device != null) {
 				_devices.append (device);
 			} else {
-				debug ("no ContentDirectory service exposed for %s", proxy.get_friendly_name ());
+				RB.debug ("no ContentDirectory service exposed for %s", proxy.get_friendly_name ());
 			}
 		}
 	
 		private void on_device_proxy_unavailable (GUPnP.DeviceProxy proxy)
 		{
-			debug ("device unavailable '%s': %s", proxy.get_friendly_name (), proxy.get_device_type ());
+			RB.debug ("device unavailable '%s': %s", proxy.get_friendly_name (), proxy.get_device_type ());
 			var device = find_device_for_udn (proxy.udn);
 			if (device == null) {
 				warning ("cannot find proxy device: %s", proxy.udn);
