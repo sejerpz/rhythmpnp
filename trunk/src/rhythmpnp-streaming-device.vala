@@ -71,7 +71,6 @@ namespace RhythmPnP
 			// setup the view
 			_view = new RB.EntryView (db, shell.get_player (), "%s/%s".printf (DefaultOptions.CONF_PREFIX, DefaultOptions.SORTING));
 			_view.append_column (EntryViewColumn.TITLE, true);
-			_view.append_column (EntryViewColumn.GENRE, false);
 			_view.append_column (EntryViewColumn.RATING, false);
 			_view.append_column (EntryViewColumn.LAST_PLAYED, false);
 		
