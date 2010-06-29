@@ -21,16 +21,19 @@
 
 using GLib;
 
-public interface IUPnPDevice : GLib.Object
+namespace RhythmPnP
 {
-	public abstract string id {
-		get; set;
-	}
+	public interface IDevice : GLib.Object
+	{
+		public abstract string id {
+			get; set;
+		}
 	
-	public abstract bool is_loading {
-		get; set;
-	}
+		public abstract bool is_loading {
+			get; set;
+		}
 	
-	public abstract void cleanup ();
+		public abstract void cleanup ();
+	}
 }
 

@@ -25,9 +25,8 @@ using Gtk;
 using GUPnP;
 using RhythmDB;
 
-namespace Utils
+namespace RhythmPnP.Utils
 {
-
 	internal static Gdk.Pixbuf? get_device_icon (DeviceProxy device, int preferred_depth, int preferred_width, int preferred_height)
 	{
 		Gdk.Pixbuf pixbuf = null;
