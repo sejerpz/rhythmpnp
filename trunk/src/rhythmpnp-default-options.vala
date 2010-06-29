@@ -21,7 +21,7 @@
 
 using GLib;
 
-namespace DefaultOptions
+namespace RhythmPnP.DefaultOptions
 {
 	internal const int SEARCH_CHUNK_SIZE = 500;
 	internal const int ICON_PREFERRED_DEPTH = 32;
