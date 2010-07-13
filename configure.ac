@@ -1,4 +1,4 @@
-AC_INIT([rhythmpnp], [0.2.0], [sejerpz@tin.it], [rhythmpnp])
+AC_INIT([rhythmpnp], [0.2.1], [sejerpz@tin.it], [rhythmpnp])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([dist-bzip2])
