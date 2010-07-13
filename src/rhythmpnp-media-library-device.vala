@@ -188,9 +188,9 @@ namespace RhythmPnP
 					db.entry_set (entry, EntryPropType.TITLE, item.title ?? "");
 					db.entry_set (entry, EntryPropType.ALBUM, item.album ?? "");
 					db.entry_set (entry, EntryPropType.ARTIST, item.creator ?? "");
-					if (item.track_number < 4294967295) // 2^32 no value
+					if (item.track_number >= 4294967295) // 2^32 no value
 						db.entry_set (entry, EntryPropType.TRACK_NUMBER, (ulong)item.track_number);
-					if (res.duration < 4294967295) // 2^32 no value
+					if (res.duration >= 4294967295) // 2^32 no value
 						db.entry_set (entry, EntryPropType.DURATION, (ulong)res.duration);
 					db.entry_set (entry, EntryPropType.GENRE, item.genre ?? "");
 				}
