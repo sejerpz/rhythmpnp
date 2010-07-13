@@ -94,7 +94,8 @@ namespace RhythmDB
 	[Compact]
 	public class Entry
 	{
-		
+		[CCode(cname="rhythmdb_entry_get_string")]
+		public unowned string get_string (EntryPropType propid);
 	}
 	
 	[CCode(cname="RhythmDB")]
