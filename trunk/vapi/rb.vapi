@@ -197,6 +197,13 @@ namespace RB {
 		public EntryView (RhythmDB.DB db, GLib.Object shell_player, string sort_key, bool is_drag_source = false, bool is_drag_dest = false);
 		public void append_column (EntryViewColumn column_type, bool always_visible);
 		public void set_model (RhythmDB.QueryModel model);
+		
+		public signal void entry_activated (RhythmDB.Entry entry);
+		
+		[NoAccessorMethod]
+		public RhythmDB.DB db {
+			owned get; construct;
+		}
 	}
 	
 	[CCode (cheader_filename="rb-debug.h")]
