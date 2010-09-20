@@ -36,7 +36,8 @@ namespace RhythmPnP
 		private bool _activated = false;
 		private ServiceProxy _service_proxy;
 		private int _starting_index = 0;
-	
+		private Timer timer = new Timer ();
+
 		private GLib.List<GUPnP.DIDLLiteItem> _cache = new GLib.List<GUPnP.DIDLLiteItem>();
 	
 		public string id {
@@ -77,6 +78,8 @@ namespace RhythmPnP
 				_starting_index = 0;
 				is_loading = true;
 				this.notify_status_changed ();
+				timer = new Timer ();
+				timer.start ();
 				start_music_search ();
 			}
 		}
@@ -140,6 +143,7 @@ namespace RhythmPnP
 
 			if (_deleted)  { // if the source was delete stop scanning the media library
 				is_loading = false;
+				timer = null;
 				return;
 			}
 			
@@ -155,7 +159,7 @@ namespace RhythmPnP
 				parser.item_available.disconnect (this.on_item_available);
 			}
 
-			if (_cache.length() > 0) {		
+			if (_cache.length() > 0) {
 				var db = shell.db;
 				foreach (GUPnP.DIDLLiteItem item in _cache) {
 					add_entry (db, item);
@@ -165,6 +169,9 @@ namespace RhythmPnP
 			_cache = null;
 		
 			if ((_starting_index + number) >= total_matches) {
+				timer.stop ();
+				RB.debug ("time elapsed to download the song database: %g", timer.elapsed ());
+				timer = null;
 				is_loading = false;
 				this.notify_status_changed ();
 			} else {
@@ -181,13 +188,14 @@ namespace RhythmPnP
 	
 		private void add_entry (RhythmDB.DB db, GUPnP.DIDLLiteItem item)
 		{
-			var res = Utils.get_best_resource (item);		
+			var res = Utils.get_best_resource (item);
 			if (res != null) {
 				unowned RhythmDB.Entry? entry = db.entry_new (this.entry_type, res.uri);
 				if (entry != null) {
 					db.entry_set (entry, EntryPropType.TITLE, item.title ?? "");
 					db.entry_set (entry, EntryPropType.ALBUM, item.album ?? "");
 					db.entry_set (entry, EntryPropType.ARTIST, item.creator ?? "");
+					db.entry_set (entry, EntryPropType.GENRE, item.genre ?? "");
 					if (item.track_number < 4294967295) // 2^32 no value
 						db.entry_set (entry, EntryPropType.TRACK_NUMBER, (ulong)item.track_number);
 					if (res.duration < 4294967295) // 2^32 no value
