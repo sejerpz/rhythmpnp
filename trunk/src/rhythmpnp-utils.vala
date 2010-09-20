@@ -105,7 +105,7 @@ namespace RhythmPnP
 				"Search", callback,
 				"ContainerID", typeof(string), "0",
 				"SearchCriteria", typeof(string), "upnp:class derivedFrom \"object.item.audioItem\"",
-				"Filter", typeof(string), "dc:title,dc:creator,dc:date,upnp:album,upnp:originalTrackNumber,upnp:genre,res@duration",
+				"Filter", typeof(string), "dc:title,dc:creator,upnp:artist,dc:date,upnp:album,upnp:originalTrackNumber,upnp:genre,res@duration",
 				"StartingIndex", typeof(int), starting_index,
 				"RequestedCount", typeof(int), requested_count,
 				"SortCriteria", typeof(string), "");
