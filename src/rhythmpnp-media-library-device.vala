@@ -194,7 +194,7 @@ namespace RhythmPnP
 				if (entry != null) {
 					db.entry_set (entry, EntryPropType.TITLE, item.title ?? "");
 					db.entry_set (entry, EntryPropType.ALBUM, item.album ?? "");
-					db.entry_set (entry, EntryPropType.ARTIST, item.creator ?? "");
+					db.entry_set (entry, EntryPropType.ARTIST, item.artist ?? (item.creator ?? ""));
 					db.entry_set (entry, EntryPropType.GENRE, item.genre ?? "");
 					if (item.track_number < 4294967295) // 2^32 no value
 						db.entry_set (entry, EntryPropType.TRACK_NUMBER, (ulong)item.track_number);
