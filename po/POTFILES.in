@@ -1,8 +1,0 @@
-[encoding: UTF-8]
-# List of source files which contain translatable strings.
-src/rhythmpnp-default-options.vala
-src/rhythmpnp-idevice.vala
-src/rhythmpnp-media-library-device.vala
-src/rhythmpnp-streaming-device.vala
-src/rhythmpnp-utils.vala
-src/rhythmpnp-plugin.vala
