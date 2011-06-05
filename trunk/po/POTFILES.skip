@@ -1,6 +1,0 @@
-src/rhythmpnp-default-options.c
-src/rhythmpnp-idevice.c
-src/rhythmpnp-media-library-device.c
-src/rhythmpnp-plugin.c
-src/rhythmpnp-streaming-device.c
-src/rhythmpnp-utils.c
